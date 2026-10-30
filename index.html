@@ -193,12 +193,15 @@ L.circleMarker([SUBJECT.lat,SUBJECT.lon],{radius:8,color:'#fff',weight:2,fillCol
 (function(){
   const q=new URLSearchParams(location.search).get('shot');
   if(!q) return;
-  window.addEventListener('load',()=>{
-    setTimeout(()=>{
-      if(q==='tabs') document.getElementById('tabs')?.scrollIntoView({block:'start'});
-      if(q==='maps') document.getElementById('maps')?.scrollIntoView({block:'start'});
-    }, 600);
-  });
+  function go(){
+    if(q==='tabs') document.getElementById('tabs')?.scrollIntoView({block:'start'});
+    if(q==='maps') document.getElementById('maps')?.scrollIntoView({block:'start'});
+  }
+  if(document.readyState==='complete') go();
+  else window.addEventListener('load', go);
+  // also run after a beat for maps tiles
+  setTimeout(go, 200);
+  setTimeout(go, 1000);
 })();
 </script>
 </body></html>
