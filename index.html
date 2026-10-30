@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Open House · 182 Ponana St · Keawakapu Views</title>
+  <meta name="description" content="Open house at 182 Ponana St, Keawakapu Views, Kihei. Fri Oct 30 & Sat Oct 31, 9am–5pm HST. Subdivision map + comps. Devin Atkins, Coldwell Banker Island Properties." />
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root { --forest:#2F3E34; --cream:#F5F0E8; --teal:#0F766E; --sage:#A3B18A; --active:#16A34A; --pending:#D97706; --sold:#DC2626; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--cream); color:var(--forest); }
+    header { background:#000; color:#fff; border-bottom:2px solid var(--sage); }
+    .wrap { max-width: 34rem; margin:0 auto; padding:1.25rem 1.25rem 4rem; }
+    .head { display:flex; gap:1rem; align-items:flex-start; padding:1.5rem 1.25rem 1.25rem; max-width:34rem; margin:0 auto; }
+    .name { font-size:1.125rem; font-weight:650; letter-spacing:.14em; text-transform:uppercase; }
+    .tag { font-size:.625rem; letter-spacing:.22em; text-transform:uppercase; color:var(--sage); margin-top:.25rem; }
+    .eyebrow { font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; opacity:.7; margin-top:.75rem; }
+    .subtitle { font-size:.9rem; color:rgba(255,255,255,.85); margin-top:.35rem; }
+    .broker { font-size:.7rem; color:rgba(163,177,138,.95); margin-top:.6rem; line-height:1.4; }
+    .shot { width:72px; height:72px; border-radius:999px; object-fit:cover; border:2px solid var(--sage); flex-shrink:0; }
+    .hero { background:#fff; border-radius:1.5rem; overflow:hidden; border:1px solid rgba(15,118,110,.25); border-top:6px solid #0F766E; box-shadow:0 8px 24px rgba(47,62,52,.08); }
+    .hero img { width:100%; height:14rem; object-fit:cover; display:block; }
+    .hero .body { padding:1.25rem; }
+    .badge { font-size:.7rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:var(--teal); }
+    h1 { font-size:1.6rem; margin:.35rem 0 0; line-height:1.15; }
+    .muted { opacity:.8; font-size:.9rem; }
+    .price { font-size:1.6rem; font-weight:800; margin-top:.75rem; }
+    .hours { margin-top:1rem; background:rgba(15,118,110,.08); color:var(--teal); font-weight:650; border-radius:1rem; padding:.85rem 1rem; font-size:.9rem; }
+    .btns { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
+    a.btn { display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-weight:700; font-size:.875rem; border-radius:999px; padding:.65rem 1rem; }
+    a.btn.primary { background:var(--teal); color:#fff; }
+    a.btn.ghost { background:#fff; color:var(--forest); border:2px solid var(--forest); }
+    a.link { color:var(--teal); font-weight:650; font-size:.875rem; display:inline-flex; align-items:center; gap:.35rem; margin-top:.75rem; text-decoration:none; }
+    section { margin-top:2.5rem; }
+    h2 { font-size:1.125rem; margin:0 0 .75rem; display:flex; align-items:center; gap:.5rem; }
+    .dot { width:.65rem; height:.65rem; border-radius:999px; display:inline-block; }
+    .empty { border:1px dashed rgba(47,62,52,.25); background:rgba(255,255,255,.55); border-radius:1rem; padding:1.1rem 1rem; font-size:.875rem; line-height:1.45; }
+    .card { background:#fff; border:1px solid rgba(47,62,52,.12); border-radius:1rem; overflow:hidden; box-shadow:0 2px 8px rgba(47,62,52,.04); margin-bottom:.75rem; border-left:5px solid #0F766E; }
+    .card img { width:100%; height:10rem; object-fit:cover; display:block; }
+    .card .p { padding:1rem; }
+    .card .row { display:flex; justify-content:space-between; gap:.75rem; align-items:flex-start; }
+    .card .status { font-size:.65rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    .card h3 { margin:.2rem 0 0; font-size:1rem; }
+    .subtag { display:inline-flex; align-items:center; gap:.4rem; font-size:.8rem; font-weight:700; margin-top:.25rem; }
+    .subtag i { width:.65rem; height:.65rem; border-radius:999px; display:inline-block; }
+    #submap { height:20rem; width:100%; border-radius:1rem; border:1px solid rgba(47,62,52,.12); }
+    .legend { background:#fff; border:1px solid rgba(47,62,52,.12); border-radius:1rem; padding:.85rem 1rem; margin-top:.75rem; }
+    .legend .title { font-size:.65rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; opacity:.7; margin-bottom:.5rem; }
+    .legend ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:.35rem .75rem; }
+    .legend li { display:flex; align-items:center; gap:.45rem; font-size:.75rem; }
+    .legend li span.sw { width:.75rem; height:.75rem; border-radius:2px; border:1px solid rgba(0,0,0,.1); flex-shrink:0; }
+    .legend .note { font-size:.65rem; opacity:.55; margin-top:.6rem; line-height:1.4; }
+    .mapbox { background:#fff; border:1px solid rgba(47,62,52,.12); border-radius:1rem; overflow:hidden; }
+    .mapbox iframe { width:100%; height:18rem; border:0; display:block; }
+    footer { text-align:center; margin-top:3rem; font-size:.7rem; opacity:.7; line-height:1.5; }
+    .sagebar { height:4px; background:var(--sage); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="head">
+      <div style="flex:1;min-width:0">
+        <div class="name">Devin Atkins</div>
+        <div class="tag">Maui Golf Course Real Estate</div>
+        <div class="eyebrow">Open House</div>
+        <div style="font-size:1.25rem;font-weight:700;margin-top:.25rem">182 Ponana St</div>
+        <div class="subtitle">Keawakapu Views · Kihei, Maui</div>
+        <div class="broker">R(S) RS-85088 | Coldwell Banker Island Properties | Sayles Team</div>
+      </div>
+      <img class="shot" src="https://www.devinatkins.com/images/devin-atkins-headshot.jpg" alt="Devin Atkins" width="72" height="72" onerror="this.style.display='none'" />
+    </div>
+  </header>
+
+  <main class="wrap">
+    <article class="hero">
+      <img src="https://feed-images.rewhosting.com/ramaui/Photo/Property/9dc1b3132e8858f4b3b58439c19dfe05/1-2b498f70a0729724bda959ae813a8e3a-l.webp" alt="182 Ponana St" />
+      <div class="body">
+        <div class="badge">Today's open house</div>
+        <h1>182 Ponana St</h1>
+        <div class="subtag" style="color:#0F766E"><i style="background:#0F766E"></i> Keawakapu Views <span class="muted" style="font-weight:400">· Kihei, HI 96753</span></div>
+        <div class="price">$1,995,000</div>
+        <p class="muted">3 beds · 2.5 baths · 2,088 sq ft · Fee simple · MLS 411192</p>
+        <div class="hours">Fri Oct 30 &amp; Sat Oct 31, 2026 · 9:00 AM–5:00 PM HST</div>
+        <div class="btns">
+          <a class="btn primary" href="tel:8088302511">Call 808-830-2511</a>
+          <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&amp;destination=182%20Ponana%20St%2C%20Kihei%2C%20HI%2096753" target="_blank" rel="noopener">Directions</a>
+        </div>
+        <a class="link" href="https://www.luxuryrealestatemaui.com/listing/411192-182-ponana-st/" target="_blank" rel="noopener">Full listing details →</a>
+      </div>
+    </article>
+
+    <section>
+      <h2><span class="dot" style="background:var(--active)"></span> Active &amp; under contract</h2>
+      <p class="empty">No other active or under-contract homes in Keawakapu Views right now. 182 Ponana is the only listing in the subdivision (mauiproperty.com Keawakapu Views market report, Oct 29, 2026).</p>
+    </section>
+
+    <section>
+      <h2><span class="dot" style="background:var(--pending)"></span> Pending</h2>
+      <p class="empty">No pending homes in Keawakapu Views right now.</p>
+    </section>
+
+    <section>
+      <h2><span class="dot" style="background:var(--sold)"></span> Recently sold in Keawakapu Views</h2>
+
+      <article class="card" style="border-left-color:#0F766E">
+        <div class="p">
+          <div class="row">
+            <div>
+              <div class="status" style="color:var(--sold)">Sold</div>
+              <h3>30 Ponana St</h3>
+              <div class="subtag" style="color:#0F766E"><i style="background:#0F766E"></i> Keawakapu Views</div>
+            </div>
+            <strong>Sold $1,750,000</strong>
+          </div>
+          <p class="muted" style="margin:.6rem 0 0;font-size:.875rem">3 / 2 · 1,912 sq ft · Closed 6/22/2026</p>
+          <a class="link" href="https://www.compass.com/homedetails/30-Ponana-St-Kihei-HI-96753/VHEWI_pid/" target="_blank" rel="noopener">View listing →</a>
+        </div>
+      </article>
+
+      <article class="card" style="border-left-color:#0F766E">
+        <div class="p">
+          <div class="row">
+            <div>
+              <div class="status" style="color:var(--sold)">Sold</div>
+              <h3>126 Ponana St</h3>
+              <div class="subtag" style="color:#0F766E"><i style="background:#0F766E"></i> Keawakapu Views</div>
+            </div>
+            <strong>Sold $1,950,000</strong>
+          </div>
+          <p class="muted" style="margin:.6rem 0 0;font-size:.875rem">3 / 3 · 1,762 sq ft · Closed 3/9/2026</p>
+          <a class="link" href="https://www.mauiproperty.com/property/406701/" target="_blank" rel="noopener">View listing →</a>
+        </div>
+      </article>
+
+      <article class="card" style="border-left-color:#0F766E">
+        <img src="https://www.mauirealestate.net/RETS/maui-images/407386_1.jpg" alt="147 Ponana St" loading="lazy" />
+        <div class="p">
+          <div class="row">
+            <div>
+              <div class="status" style="color:var(--sold)">Sold</div>
+              <h3>147 Ponana St</h3>
+              <div class="subtag" style="color:#0F766E"><i style="background:#0F766E"></i> Keawakapu Views</div>
+            </div>
+            <strong>Sold $1,875,000</strong>
+          </div>
+          <p class="muted" style="margin:.6rem 0 0;font-size:.875rem">3 / 2 · 1,988 sq ft · Closed 11/21/2025</p>
+          <a class="link" href="https://www.mauirealestate.net/mls-407386.html" target="_blank" rel="noopener">View listing →</a>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>Neighborhood map</h2>
+      <p class="muted" style="margin:0 0 .75rem;font-size:.875rem;line-height:1.45">Every nearby subdivision shaded in its own color. Keawakapu Views (today) is highlighted. Tap a shape for the name.</p>
+      <div id="submap"></div>
+      <div class="legend">
+        <div class="title">Subdivision colors</div>
+        <ul id="legend-list"></ul>
+        <p class="note">Outlines are real TMK plat unions from Hawaii Statewide GIS (simplified for the web) — not freehand guesses.</p>
+      </div>
+
+      <p class="muted" style="margin:1.5rem 0 .75rem;font-size:.875rem;line-height:1.45">Satellite view of 182 Ponana. Open Google Earth for a full 3D flyover.</p>
+      <div class="mapbox">
+        <iframe title="182 Ponana St satellite map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
+          src="https://www.google.com/maps?q=20.707865256391,-156.439844128134&amp;z=18&amp;t=k&amp;output=embed"></iframe>
+      </div>
+      <div class="btns">
+        <a class="btn primary" href="https://earth.google.com/web/@20.707865256391,-156.439844128134,50a,200d,35y,0h,60t,0r" target="_blank" rel="noopener">Open Google Earth 3D</a>
+      </div>
+    </section>
+
+    <footer>
+      <a class="link" href="https://devinatkins.com" target="_blank" rel="noopener">Visit devinatkins.com</a>
+      <p style="margin-top:.75rem">Devin Atkins · R(S) RS-85088 · Coldwell Banker Island Properties · Sayles Team<br/>808-830-2511</p>
+      <p style="opacity:.55;margin-top:.5rem">Listing data from public MLS feeds · verified Oct 29, 2026 · not a formal CMA<br/>Reusable template: swap the subject + subdivision comps for the next open house.</p>
+    </footer>
+  </main>
+  <div class="sagebar" aria-hidden="true"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    (async function () {
+      const map = L.map('submap', { zoomControl: true }).setView([20.707865, -156.439844], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.85, attribution: 'Esri' }).addTo(map);
+      const res = await fetch('nearby-subdivisions.json');
+      const data = await res.json();
+      const layer = L.geoJSON(data, {
+        style: function (feat) {
+          const name = feat.properties.name;
+          const c = feat.properties.color;
+          const isSubject = name === 'Keawakapu Views';
+          return { color: c, weight: isSubject ? 3 : 2, fillColor: c, fillOpacity: isSubject ? 0.45 : 0.28 };
+        },
+        onEachFeature: function (feat, lyr) {
+          lyr.bindTooltip(feat.properties.name, { sticky: true, direction: 'top' });
+        }
+      }).addTo(map);
+      L.circleMarker([20.707865, -156.439844], { radius: 8, color: '#fff', weight: 2, fillColor: '#0F766E', fillOpacity: 1 })
+        .bindTooltip('182 Ponana St · Open House').addTo(map);
+      try { map.fitBounds(layer.getBounds(), { padding: [24, 24] }); } catch (e) {}
+      const ul = document.getElementById('legend-list');
+      data.features.forEach(function (f) {
+        const name = f.properties.name;
+        const c = f.properties.color;
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="sw" style="background:' + c + '"></span>' +
+          (name === 'Keawakapu Views' ? '<strong>' + name + ' (today)</strong>' : name);
+        ul.appendChild(li);
+      });
+    })();
+  </script>
+</body>
+</html>
